@@ -4,7 +4,7 @@ import matplotlib.patches as patches
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import sys 
 
-sys.setrecursionlimit(9999999999999)
+sys.setrecursionlimit(999999999)
 
 class BSPNode:
     def __init__(self, bounds, axis=None, split_value=None, left=None, right=None, fitness=None, parent=None):
