@@ -23,7 +23,6 @@ class ContinuousTSP:
         dist += self.euclidean_distance(self.cities[tour[-1]], self.cities[tour[0]])  # Return to the starting point
         return dist
 
-
     def gradient_computation(self, tour):
         gradient = np.zeros_like(self.cities, dtype=np.float64)
         # Calculate the pairwise Euclidean distances
@@ -59,6 +58,8 @@ def sba_test(tsp, filename, run_num):
     #new_row = pd.DataFrame([row], columns=df.columns)  # Create a DataFrame for the new row
     #df = pd.concat([df, new_row], ignore_index=True)  # Concatenate the new row
     df.to_csv(filename, index=False)        
+    
+    print("filename: ", filename)
 
     cities = tsp.cities  # Assuming tsp.cities gives the coordinates of the cities
     closed_tour = np.append(best_tour, best_tour[0])  # Close the tour by adding the first city at the end
@@ -98,8 +99,9 @@ def sba_test(tsp, filename, run_num):
         showlegend=True
     )
 
-    plot = os.path.join("./optimizer_results/sba_results", f"sba_plot_{run_num}.html")
+    plot = os.path.join(f"./optimizer_results/sba_results_{tsp.num_cities}", f"sba_plot_{run_num}.html")
     os.makedirs(os.path.dirname(plot), exist_ok=True)
+    print("plot: ", plot )
     fig.write_html(plot)
 
 
@@ -163,7 +165,7 @@ def hdffa_test(tsp, filename, run_num):
         showlegend=True
     )
 
-    plot = os.path.join("./optimizer_results/hdffa_results", f"hdffa_plot_{run_num}.html")
+    plot = os.path.join(f"./optimizer_results/hdffa_results_{tsp.num_cities}", f"hdffa_plot_{run_num}.html")
     os.makedirs(os.path.dirname(plot), exist_ok=True)
     fig.write_html(plot)
 
@@ -238,7 +240,7 @@ def bf_test(tsp, filename, run_num):
         showlegend=True
     )
 
-    plot = os.path.join("./optimizer_results/bf_results", f"bf_plot_{run_num}.html")
+    plot = os.path.join(f"./optimizer_results/bf_results_{tsp.num_cities}", f"bf_plot_{run_num}.html")
     os.makedirs(os.path.dirname(plot), exist_ok=True)
     fig.write_html(plot)
 
@@ -259,23 +261,31 @@ def test_runner():
     
     filename_base = './optimizer_results/'
 
-    sba_dir = filename_base + 'sba_results/'
-    os.makedirs(sba_dir, exist_ok=True)  
-    hdffa_dir = filename_base + 'hdffa_results/'
-    os.makedirs(hdffa_dir, exist_ok=True)  
-    bd_dir = filename_base + 'bf_results/'
-    os.makedirs(bd_dir, exist_ok=True)  
+    #sba_dir = filename_base + 'sba_results/'
+    #os.makedirs(sba_dir, exist_ok=True)  
+    #hdffa_dir = filename_base + 'hdffa_results/'
+    #os.makedirs(hdffa_dir, exist_ok=True)  
+    #bd_dir = filename_base + 'bf_results/'
+    #os.makedirs(bd_dir, exist_ok=True)  
 
     num_cities = [3, 5, 8, 10, 12, 15, 20, 25]
     
     for idx1 in num_cities:
         for idx2 in range(5):
+            sba_dir = filename_base + 'sba_results_' + str(idx1) +'/'
+            print(sba_dir)
+            os.makedirs(sba_dir, exist_ok=True)
+            hdffa_dir = filename_base + 'hdffa_results_' + str(idx1) +'/'
+            os.makedirs(hdffa_dir, exist_ok=True)
+            bd_dir = filename_base + 'bf_results_' + str(idx1) + '/'
+            os.makedirs(bd_dir, exist_ok=True)
+
             tsp = random_city_tsp_generator(idx1)
-            filename = filename_base + 'sba_results/sba_run_' + str(idx2) + '_' + str(idx1) + '_cities.csv'
+            filename = filename_base + 'sba_results_' + str(tsp.num_cities) + '/sba_run_' + str(idx2) + '_' + str(idx1) + '_cities.csv'
             sba_test(tsp, filename, idx2)
-            filename = filename_base + 'hdffa_results/hdffa_run_' + str(idx2) + '_' + str(idx1) + '_cities.csv'
+            filename = filename_base + 'hdffa_results_' + str(tsp.num_cities) + '/hdffa_run_' + str(idx2) + '_' + str(idx1) + '_cities.csv'
             hdffa_test(tsp, filename, idx2)            
-            filename = filename_base + 'bf_results/bf_run_' + str(idx2) + '_' + str(idx1) + '_cities.csv'          
+            filename = filename_base + 'bf_results_' + str(tsp.num_cities) + '/bf_run_' + str(idx2) + '_' + str(idx1) + '_cities.csv'          
             bf_test(tsp, filename, idx2)
 
 
