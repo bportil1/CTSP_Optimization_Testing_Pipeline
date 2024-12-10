@@ -58,7 +58,7 @@ class SimulatedAnnealingOptimizer:
         
         print("Final Error: ", curr_energy)
         print("Final Position: ", self.curr_pt)
-        return self.curr_pt, curr_energy, self.obj_comp_temp 
+        return self.curr_pt, curr_energy, self.obj_comp_temp, idx 
 
     def solution_transition(self, tour):
         new_position = tour.copy()
@@ -123,7 +123,8 @@ class SwarmBasedAnnealingOptimizer:
         print("Beggining Optimization")
         self.provisional_minimum = self.provisional_min_computation()
         print("Provisional Minimum: ", self.provisional_minimum)
-        
+        last_avg_fitness = float('inf')
+        avg_finess_nondecrease_ctr = 0
         for iteration in range(self.max_iter):
             print("Current Iteration: ", iteration)
             for i in range(self.num_particles):
@@ -163,13 +164,25 @@ class SwarmBasedAnnealingOptimizer:
                     self.global_best_fitness = self.personal_best_fitness[min_fitness_idx]
                     self.global_best_position = self.personal_best_positions[min_fitness_idx]
 
+
+            avg_fitness = np.average(self.personal_best_fitness)
+            if math.isclose(avg_fitness, last_avg_fitness, rel_tol = 1e-6):
+                avg_fitness_nondecrease_ctr += 1
+            else:
+                avg_fitness_nondecrease_ctr = 0
+            if avg_fitness_nondecrease_ctr == 50:
+                print("Early Convergence, Breaking")
+                break
+            print("Last and Current Average Fitness: ", last_avg_fitness, " ", avg_fitness)
+            last_avg_fitness = avg_fitness
             self.provisional_minimum = self.provisional_min_computation()
+            print("Current Converging Fitness Counter: ", avg_fitness_nondecrease_ctr)
             print("Provisional Minimum: ", self.provisional_minimum)
         print("Completed Optimization")
-        return self.global_best_position, self.global_best_fitness, self.obj_comp_temp 
+        return self.global_best_position, self.global_best_fitness, self.obj_comp_temp, iteration 
 
 class HdFireflySimulatedAnnealingOptimizer:
-    def __init__(self, ctsp_obj,  dimensions, range_max, pop_test=100, hdfa_iterations=1000, gamma=1, alpha=.2): 
+    def __init__(self, ctsp_obj,  dimensions, range_max, pop_test=100, hdfa_iterations=500, gamma=1, alpha=.2): 
         self.ctsp_obj = ctsp_obj
 
         self.pop_test = pop_test 
@@ -339,14 +352,15 @@ class HdFireflySimulatedAnnealingOptimizer:
                 print('HDFA Iteration: ', hdfa_ctr)
                 print('Steps Without Increasing Alpha: ', nonincreasing_alpha_counter)
 
-                if last_alpha >= alpha_avg:
+                #if last_alpha >= alpha_avg:
+                if math.isclose(last_alpha, alpha_avg, rel_tol = 1e-03):
                     nonincreasing_alpha_counter += 1
                 else:
                     nonincreasing_alpha_counter = 0
 
                 last_alpha = alpha_avg
 
-                if nonincreasing_alpha_counter == 10 or alpha_avg == 0 or hdfa_ctr == 100 or math.isnan(nonincreasing_alpha_counter):
+                if nonincreasing_alpha_counter == 10 or alpha_avg == 0 or hdfa_ctr == self.hdfa_iterations or math.isnan(nonincreasing_alpha_counter):
                     maturity_condition = True 
                     print("Early Convergence")                   
                     break                    
@@ -364,12 +378,14 @@ class HdFireflySimulatedAnnealingOptimizer:
 
         sa = SimulatedAnnealingOptimizer(self.ctsp_obj, best_pt_est, temperature=10, cooling_rate = .95)
         
-        sa_min_pt, sa_min_fitness, obj_ct = sa.optimize()
+        sa_min_pt, sa_min_fitness, obj_ct, sa_itr = sa.optimize()
 
         self.obj_comp_temp += obj_ct
+
+        hdfa_ctr += sa_itr
 
         print("Final SA Min Position: ", sa_min_pt)
         print("Final SA Error: ", sa_min_fitness)
        
-        return sa_min_pt, sa_min_fitness, self.obj_comp_temp 
+        return sa_min_pt, sa_min_fitness, self.obj_comp_temp, hdfa_ctr 
 

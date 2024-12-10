@@ -44,10 +44,10 @@ def sba_test(tsp, filename, run_num):
     sba = SwarmBasedAnnealingOptimizer(tsp, 300, 3, 1000)
 
     start_time = time.time()
-    best_tour, best_distance, obj_ct = sba.optimize()
+    best_tour, best_distance, obj_ct, itrs = sba.optimize()
     exc_time = time.time() - start_time
 
-    data = {'best_tour': [str(best_tour)], 'best_distance': [best_distance], 'obj_exc_ct': [obj_ct], 'runtime': [exc_time]}
+    data = {'best_tour': [str(best_tour)], 'best_distance': [best_distance], 'obj_exc_ct': [obj_ct], 'runtime': [exc_time], 'iterations': [itrs]}
 
     print("SBA Best tour:", best_tour)
     print("SBA Best distance:", best_distance)
@@ -109,13 +109,13 @@ def hdffa_test(tsp, filename, run_num):
 
     ######### HD FIREFLY
 
-    hdffsa = HdFireflySimulatedAnnealingOptimizer(tsp, 3, [0, 110], pop_test=300)
+    hdffsa = HdFireflySimulatedAnnealingOptimizer(tsp, 3, [0, 110], pop_test=300, hdfa_iterations=200)
 
     start_time = time.time()
-    best_tour, best_distance, obj_ct = hdffsa.optimize()
+    best_tour, best_distance, obj_ct, itrs = hdffsa.optimize()
     exc_time = time.time() - start_time
 
-    data = {'best_tour': [str(best_tour)], 'best_distance': [best_distance], 'obj_exc_ct': [obj_ct], 'runtime': [exc_time]}
+    data = {'best_tour': [str(best_tour)], 'best_distance': [best_distance], 'obj_exc_ct': [obj_ct], 'runtime': [exc_time], 'iterations': [itrs]}
 
     print("HDFFA Best tour:", best_tour)
     print("HDFFA Best distance:", best_distance)
@@ -273,7 +273,6 @@ def test_runner():
     for idx1 in num_cities:
         for idx2 in range(5):
             sba_dir = filename_base + 'sba_results_' + str(idx1) +'/'
-            print(sba_dir)
             os.makedirs(sba_dir, exist_ok=True)
             hdffa_dir = filename_base + 'hdffa_results_' + str(idx1) +'/'
             os.makedirs(hdffa_dir, exist_ok=True)
