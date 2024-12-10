@@ -169,7 +169,7 @@ class SwarmBasedAnnealingOptimizer:
         return self.global_best_position, self.global_best_fitness, self.obj_comp_temp 
 
 class HdFireflySimulatedAnnealingOptimizer:
-    def __init__(self, ctsp_obj,  dimensions, range_max, pop_test=20, hdfa_iterations=100, gamma=1, alpha=.2): 
+    def __init__(self, ctsp_obj,  dimensions, range_max, pop_test=100, hdfa_iterations=1000, gamma=1, alpha=.2): 
         self.ctsp_obj = ctsp_obj
 
         self.pop_test = pop_test 

@@ -42,7 +42,7 @@ class ContinuousTSP:
 
 def sba_test(tsp, filename, run_num):
 
-    sba = SwarmBasedAnnealingOptimizer(tsp, 10, 3, 10)
+    sba = SwarmBasedAnnealingOptimizer(tsp, 10, 100, 3, 1000)
 
     start_time = time.time()
     best_tour, best_distance, obj_ct = sba.optimize()
@@ -107,7 +107,7 @@ def hdffa_test(tsp, filename, run_num):
 
     ######### HD FIREFLY
 
-    hdffsa = HdFireflySimulatedAnnealingOptimizer(tsp, 3, [0, 110], pop_test=10)
+    hdffsa = HdFireflySimulatedAnnealingOptimizer(tsp, 3, [0, 110], pop_test=100)
 
     start_time = time.time()
     best_tour, best_distance, obj_ct = hdffsa.optimize()
@@ -266,10 +266,10 @@ def test_runner():
     bd_dir = filename_base + 'bf_results/'
     os.makedirs(bd_dir, exist_ok=True)  
 
-    num_cities = [2] #5,10,15]
+    num_cities = [3, 5, 8, 10, 12, 15, 20, 25]
     
     for idx1 in num_cities:
-        for idx2 in range(2):
+        for idx2 in range(5):
             tsp = random_city_tsp_generator(idx1)
             filename = filename_base + 'sba_results/sba_run_' + str(idx2) + '_' + str(idx1) + '_cities.csv'
             sba_test(tsp, filename, idx2)

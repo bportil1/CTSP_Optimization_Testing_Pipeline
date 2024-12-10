@@ -2,6 +2,9 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+import sys 
+
+sys.setrecursionlimit(9999999999999)
 
 class BSPNode:
     def __init__(self, bounds, axis=None, split_value=None, left=None, right=None, fitness=None, parent=None):
@@ -13,13 +16,23 @@ class BSPNode:
         self.fitness = fitness  # Random fitness value assigned to this node
         self.parent = parent  # Parent node (for updating relationships)
 
-    
+    '''
     def update_fitness(self, new_fitness):
         """Method to update the fitness of the node dynamically."""
         # Fitness calculation can be customized, using volume or other properties
         self.fitness = new_fitness
         if self.parent:
             self.parent.update_fitness(new_fitness)  
+    '''
+
+    def update_fitness(self, new_fitness):
+        # Using an iterative approach to update fitness up the tree
+        current_node = self
+        while current_node is not None:
+            # Update fitness for the current node
+            current_node.fitness = new_fitness
+            # Move to the parent node
+            current_node = current_node.parent
 
     def split(self, new_fitness):
         """Split the current region into two new regions."""
@@ -73,6 +86,37 @@ def generate_bsp_tree(bounds, depth, max_depth):
     return BSPNode(bounds, axis, split_value, left_node, right_node, fitness)
 
 def find_region(node, point):
+    """Finds the region to which the given point belongs using an iterative approach."""
+    current_node = node
+    while current_node is not None:
+        # Check if the point is inside the current node's bounds
+        inside = True
+        for i, (min_val, max_val) in enumerate(current_node.bounds):
+            if not (min_val <= point[i] <= max_val):
+                inside = False
+                break
+        
+        if inside:
+            # If it's a leaf node, return this node
+            if current_node.left is None and current_node.right is None:
+                return current_node
+
+            # Debugging print statements to track the splits and decisions
+            #print(f"Point: {point.tolist()}, Axis: {current_node.axis}, Split Value: {current_node.split_value}")
+
+            # Determine which child to traverse based on the split value
+            if point[current_node.axis] < current_node.split_value:
+                current_node = current_node.left
+            else:
+                current_node = current_node.right
+        else:
+            return None
+
+    return None
+
+
+'''
+def find_region(node, point):
     """Recursively finds the region to which the given point belongs."""
     if node is None:
         return None
@@ -88,14 +132,19 @@ def find_region(node, point):
         # If the point is inside the bounds, return the current node directly
         if node.left is None and node.right is None:
             return node  # This is a leaf node, so return this node
+     
+        #print(f"Point: {point}, Axis: {node.axis}, Split Value: {node.split_value}")
         
         # If not a leaf, we will go deeper into the tree depending on the axis
         if point[node.axis] < node.split_value:
-            return find_region(node.left, point)
+            if node.left:
+                return find_region(node.left, point)
         else:
-            return find_region(node.right, point)
+            if node.right:
+            	return find_region(node.right, point)
     
     return None
+'''
 
 def find_neighbors(node, n):
     """Finds neighboring regions of a given node and returns them."""
@@ -168,20 +217,4 @@ def find_bounding_box_center(bounds):
     for min_val, max_val in bounds:
         center.append((min_val + max_val) / 2)
     return center
-'''
-def is_point_in_tree(root, point):
-    """Recursively checks if a point is already inside the tree's regions."""
-    # Traverse down to the leaves and check if the point is inside any region
-    if root is None:
-        return False
 
-    # If it's a leaf node, check if the point is within the bounds of this node
-    if root.left is None and root.right is None:
-        return is_point_in_region(root, point)
-
-    # Recursively check left or right based on the point's value along the split axis
-    if point[root.axis] < root.split_value:
-        return is_point_in_tree(root.left, point)
-    else:
-        return is_point_in_tree(root.right, point)
-'''
