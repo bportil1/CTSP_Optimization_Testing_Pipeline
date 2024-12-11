@@ -268,7 +268,7 @@ def test_runner():
     #bd_dir = filename_base + 'bf_results/'
     #os.makedirs(bd_dir, exist_ok=True)  
 
-    num_cities = [3, 5, 8, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+    num_cities = [8, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     
     for idx1 in num_cities:
         for idx2 in range(5):
